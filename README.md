@@ -12,7 +12,7 @@ To get started contributing to PZ Bot:
 2. Request to contribute on Github, and team leaders or admins may give you permissions
 3. Fork this repository
 4. Create your own discord bot application for testing locally. We recommend using an easily identifiable name, like `pzbot_<your_name>`. [Red Docs](https://docs.discord.red/en/stable/bot_application_guide.html)
-5. Set up Red bot with your application token and prefix. [Docs](https://docs.discord.red/en/stable/install_linux_mac.html#installing-red)
+5. Set up Red bot with your application token and prefix. ([Linux/Mac](https://docs.discord.red/en/stable/install_linux_mac.html#installing-red)) ([Windows](https://docs.discord.red/en/stable/install_windows.html))
 6. Assign yourself to a task on our [project board](https://github.com/PortZeroGroup/PZ-DiscordBot/projects/1) or [issue tracker](https://github.com/PortZeroGroup/PZ-DiscordBot/issues)
 7. Code and test locally. (**Do not check in your credentials**)
 8. Submit a Pull Request from your fork back into [PZ-DiscordBot](https://github.com/PortZeroGroup/PZ-DiscordBot). (**Do not check in your credentials**)
