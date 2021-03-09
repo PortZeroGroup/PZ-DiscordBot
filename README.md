@@ -8,7 +8,7 @@ This bot is built with Python, using the Red framework. Here are the docs for [R
 At a high level, bot commands and features are implemented as plugins (Red calls them "cogs" so we'll call them that from here on).
 
 To get started contributing to PZ Bot:
-1. Join the Port Zero discord server and join the project (#discord-bot-dev channel)
+1. Join the [Port Zero discord server](https://discord.gg/jmHWZA4vg5) and join the project (#discord-bot-dev channel)
 2. Request to contribute on Github, and team leaders or admins may give you permissions
 3. Fork this repository
 4. Create your own discord bot application for testing locally. We recommend using an easily identifiable name, like `pzbot_<your_name>`. [Red Docs](https://docs.discord.red/en/stable/bot_application_guide.html)
