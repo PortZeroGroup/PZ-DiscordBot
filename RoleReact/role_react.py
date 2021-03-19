@@ -72,8 +72,7 @@ class RoleEmojiConverter(Converter):
                     "That does not look like a valid emoji.")
 
         try:
-            # TODO role = await RoleHierarchyConverter().convert(ctx, role.strip())
-            role = await RoleConverter().convert(ctx, role.strip())
+            role = await RoleHierarchyConverter().convert(ctx, role.strip())
         except commands.BadArgument:
             raise
         return role, custom_emoji
@@ -92,8 +91,7 @@ class RoleCategoryConverter(Converter):
         category = sanitize_input(category)
 
         try:
-            # TODO role = await RoleHierarchyConverter().convert(ctx, role.strip())
-            role = await RoleConverter().convert(ctx, role.strip())
+            role = await RoleHierarchyConverter().convert(ctx, role.strip())
         except commands.BadArgument:
             raise
         return role, category
@@ -104,7 +102,10 @@ class RoleReact(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(
-            self, identifier=28495814093949, force_registration=True)
+            self,
+            identifier=28495814093949,
+            force_registration=True,
+        )
         default_global = {
             'version': '0.0.0',
         }
@@ -134,22 +135,8 @@ class RoleReact(commands.Cog):
         """
         pass
 
-    # TODO Remove this
-    @roles.command(name='debugcreate')
-    async def debugaddrole(self, ctx: Context, *role_names: str):
-        for role_name in role_names:
-            role = await ctx.guild.create_role(name=role_name)
-        await ctx.send('Created {}'.format(humanize_list(role_names)))
-
-    # TODO Remove this
-    @roles.command(name='debugremove')
-    async def debugremoverole(self, ctx: Context, *roles: RoleConverter):
-        for role in roles:
-            await role.delete()
-        await ctx.send('Removed {}'.format(humanize_list(roles)))
-
     @roles.command(name='add')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def add_roles(self, ctx: Context, *role_emoji: RoleEmojiConverter):
         async with self.get_guild_config(ctx).roles() as roles:
             for role, emoji in role_emoji:
@@ -163,18 +150,21 @@ class RoleReact(commands.Cog):
         await ctx.send('Added {}'.format(humanize_list([role.name for role, emoji in role_emoji])))
 
     @roles.command(name='print')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def print_roles(self, ctx: Context):
         async with self.get_guild_config(ctx).roles() as all_roles:
-            msg = ''
+            embed = discord.Embed(color=0xFF0000)
+            field_value = ''
             for role in sorted(all_roles):
-                msg += '> {} - {}\n'.format(all_roles[role]['emoji'], role)
-            if msg == '':
-                msg = 'No roles configured'
-            await ctx.send(msg)
+                field_value += '{} - {}\n'.format(
+                    all_roles[role]['emoji'], role)
+            if field_value == '':
+                field_value = 'No roles configured'
+            embed.add_field(name='Roles', value=field_value)
+            await ctx.send(embed=embed)
 
     @roles.command(name='remove')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def remove_roles(self, ctx: Context, *roles_to_remove: RoleConverter):
         async with self.get_guild_config(ctx).roles() as roles:
             for role in list(roles_to_remove):
@@ -198,27 +188,29 @@ class RoleReact(commands.Cog):
         await ctx.send('Removed {}'.format(humanize_list(roles_to_remove)))
 
     @roles.command(name='setmenu')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def setmenu_roles(self, ctx: Context, message: discord.Message):
         async with self.get_guild_config(ctx).reaction_message_ref() as reaction_message_ref:
             reaction_message_ref['message_id'] = message.id
             reaction_message_ref['channel_id'] = message.channel.id
-            async with self.get_guild_config(ctx).roles() as roles:
-                for role in roles:
-                    await message.add_reaction(roles[role]['emoji'])
+            async with self.get_guild_config(ctx).categories() as categories:
+                async with self.get_guild_config(ctx).roles() as roles:
+                    for category_name in sorted(categories):
+                        for role in sorted(categories[category_name]['roles']):
+                            await message.add_reaction(roles[role]['emoji'])
             await ctx.send('Set role reaction menu message: {}\n> To link to it, use the command `roles link`.'.format(message.jump_url))
 
     @roles.command(name='unsetmenu')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def unsetmenu_roles(self, ctx: Context):
         async with self.get_guild_config(ctx).reaction_message_ref() as reaction_message_ref:
             reaction_message_ref = {}
         await ctx.send('Menu message unset')
 
-    @roles.group(name='link')
-    async def link_roles(self, ctx: Context):
+    @roles.command(name='menu')
+    async def menu(self, ctx: Context):
         """
-        Link to the role reaction message
+        Link to the role reaction menu
         """
         async with self.get_guild_config(ctx).reaction_message_ref() as reaction_message_ref:
             url = 'https://discord.com/channels/{}/{}/{}'.format(
@@ -226,7 +218,9 @@ class RoleReact(commands.Cog):
                 reaction_message_ref['channel_id'],
                 reaction_message_ref['message_id'],
             )
-            await ctx.send('Self-assign roles here: {}'.format(url))
+            embed = discord.Embed()
+            embed.add_field(name='Role menu', value='[Self assign roles here]({})'.format(url))
+            await ctx.send(embed=embed)
 
     @commands.group()
     async def categories(self, ctx: Context):
@@ -236,7 +230,7 @@ class RoleReact(commands.Cog):
         pass
 
     @categories.command()
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def assign(self, ctx: Context, *role_categories: RoleCategoryConverter):
         msg = ''
         async with self.get_guild_config(ctx).categories() as categories:
@@ -276,7 +270,7 @@ class RoleReact(commands.Cog):
         await ctx.send(msg)
 
     @categories.command()
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def unassign(self, ctx: Context, *roles: RoleConverter):
         async with self.get_guild_config(ctx).categories() as categories:
             for category_name in list(categories):
@@ -300,29 +294,36 @@ class RoleReact(commands.Cog):
         await ctx.send('Removed all categories from roles {}'.format(role_text))
 
     @categories.command(name='print')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def print_categories(self, ctx: Context):
         async with self.get_guild_config(ctx).categories() as categories:
             async with self.get_guild_config(ctx).roles() as roles:
-                msg = ''
+                embed = discord.Embed(title='Role Categories', color=0xFF0000)
                 for category_name in sorted(list(categories)):
-                    if category_name != '':
-                        msg += '> \n> **{}**\n'.format(category_name)
-                    else:
-                        msg += '> \n> **Uncategorized**\n'
-                    for role in categories[category_name]['roles']:
+                    field_value = ''
+                    for role in sorted(categories[category_name]['roles']):
                         try:
                             emoji = roles[role]['emoji']
-                            msg += '> {} - {}\n'.format(
-                                roles[role]['emoji'], role)
+                            field_value += '{} - {}\n'.format(
+                                roles[role]['emoji'],
+                                role,
+                            )
                         except KeyError:
-                            msg += '> {} (no reaction set)\n'.format(role)
-                if msg == '':
-                    msg = 'There are no categories configured'
-                await ctx.send(msg)
+                            field_value += '{} (no reaction set)\n'.format(role)
+                    if field_value != '':
+                        if category_name == '':
+                            embed.add_field(
+                                name='Uncategorized', value=field_value)
+                        else:
+                            embed.add_field(name=category_name,
+                                            value=field_value)
+                if len(embed.fields) == 0:
+                    embed.add_field(name='no_categories',
+                                    value='There are no categories configured')
+                await ctx.send(embed=embed)
 
     @categories.command(name='remove')
-    # TODO @commands.admin_or_permissions(manage_roles=True)
+    @commands.admin_or_permissions(manage_roles=True)
     async def remove_categories(self, ctx: Context, *category_names: str):
         async with self.get_guild_config(ctx).categories() as categories:
             for category_name in category_names:
@@ -331,6 +332,55 @@ class RoleReact(commands.Cog):
                 except KeyError:
                     pass
             await ctx.send('Removed {}'.format(humanize_list(category_names)))
+
+    @roles.command(name='createmenuhere')
+    @commands.admin_or_permissions(manage_roles=True)
+    async def createmenuhere_roles(self, ctx: Context):
+        """
+        Create and assign the role reaction menu in place
+        
+        Deletes your message and responds with a new reaction menu that users can react to self-assign roles.
+        """
+        await ctx.message.delete()
+        async with self.get_guild_config(ctx).categories() as categories:
+            async with self.get_guild_config(ctx).roles() as roles:
+                embed = discord.Embed(
+                    title='Roles',
+                    description='Self assign roles by reacting to this message',
+                    color=0xFF0000,
+                )
+                for category_name in sorted(list(categories)):
+                    field_value = ''
+                    for role in sorted(categories[category_name]['roles']):
+                        try:
+                            emoji = roles[role]['emoji']
+                            field_value += '{} - {}\n'.format(
+                                roles[role]['emoji'],
+                                role,
+                            )
+                        except KeyError:
+                            pass
+                    if field_value != '':
+                        if category_name == '':
+                            embed.add_field(
+                                name='Uncategorized',
+                                value=field_value,
+                            )
+                        else:
+                            embed.add_field(name=category_name,
+                                            value=field_value)
+                if len(embed.fields) == 0:
+                    embed.add_field(name='no_categories',
+                                    value='There are no categories configured')
+                message = await ctx.send(embed=embed)
+        async with self.get_guild_config(ctx).reaction_message_ref() as reaction_message_ref:
+            reaction_message_ref['message_id'] = message.id
+            reaction_message_ref['channel_id'] = message.channel.id
+            async with self.get_guild_config(ctx).categories() as categories:
+                async with self.get_guild_config(ctx).roles() as roles:
+                    for category_name in sorted(categories):
+                        for role in sorted(categories[category_name]['roles']):
+                            await message.add_reaction(roles[role]['emoji'])
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
