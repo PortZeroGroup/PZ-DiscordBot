@@ -86,7 +86,7 @@ class RoleEmojiConverter(Converter):
 
 class CreateRoleEmojiConverter(Converter):
     async def convert(self, ctx: Context, argument: str) -> Tuple[discord.Role, str]:
-        arg_split = re.split(r";|,|\|", argument)
+        arg_split = re.split(r"[;,\|]", argument)
         try:
             role, emoji = arg_split
         except Exception:
@@ -118,7 +118,7 @@ class CreateRoleEmojiConverter(Converter):
 
 class RoleCategoryConverter(Converter):
     async def convert(self, ctx: Context, argument: str) -> Tuple[discord.Role, str]:
-        arg_split = re.split(r";|,|\||-", argument)
+        arg_split = re.split(r"[;,\|]", argument)
         try:
             role, category = arg_split
         except Exception:
