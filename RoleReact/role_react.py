@@ -123,7 +123,7 @@ class RoleCategoryConverter(Converter):
             role, category = arg_split
         except Exception:
             raise commands.BadArgument(
-                "Category Role must be a role followed by a category separated by either `;`, `,`, `|`, or `-`."
+                "Category Role must be a role followed by a category separated by either `;`, `,`, or `|`."
             )
 
         category = sanitize_input(category)
