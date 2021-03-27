@@ -333,7 +333,7 @@ class RoleReact(commands.Cog):
 
     @roles.command(name='remove')
     @commands.admin_or_permissions(manage_roles=True)
-    async def remove_roles(self, ctx: Context, *roles_to_remove: RoleConverter):
+    async def remove_roles(self, ctx: Context, *roles_to_remove: RoleHierarchyConverter):
         async with self.get_guild_config(ctx).roles() as roles:
             for role in list(roles_to_remove):
                 try:
@@ -422,7 +422,7 @@ class RoleReact(commands.Cog):
 
     @categories.command()
     @commands.admin_or_permissions(manage_roles=True)
-    async def unassign(self, ctx: Context, *roles: RoleConverter):
+    async def unassign(self, ctx: Context, *roles: RoleHierarchyConverter):
         async with self.get_guild_config(ctx).categories() as categories:
             for category_name in list(categories):
                 # Remove role from categories that have it
