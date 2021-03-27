@@ -117,7 +117,7 @@ class CreateRoleEmojiConverter(Converter):
 
 
 class RoleCategoryConverter(Converter):
-    async def convert(self, ctx: Context, argument: str) -> Tuple[str, discord.Role, str]:
+    async def convert(self, ctx: Context, argument: str) -> Tuple[discord.Role, str]:
         arg_split = re.split(r";|,|\||-", argument)
         try:
             role, category = arg_split
