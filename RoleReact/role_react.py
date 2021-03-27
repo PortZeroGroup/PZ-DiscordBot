@@ -56,7 +56,8 @@ class EmojiConverter(Converter):
 
         if not custom_emoji:
             try:
-                await ctx.message.add_reaction(str(argument.strip()))
+                emoji = str(argument.strip())
+                await ctx.message.add_reaction(emoji)
                 custom_emoji = emoji
             except discord.errors.HTTPException:
                 raise commands.BadArgument(
@@ -147,6 +148,7 @@ class RoleReact(commands.Cog):
             'version': '0.0.0',
         }
         default_guild = {
+            'debug_channel': '',
             'reaction_message_ref': {},
             'roles': {},
             'categories': {
